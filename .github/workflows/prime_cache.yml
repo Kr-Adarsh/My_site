@@ -1,0 +1,31 @@
+name: cache-prime
+
+on:
+  push:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Prime/restore the cache with a fixed key
+      - name: prime-cache-fe6a88c
+        id: cache-step
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/demo-fe6a88c
+          key: cache-fe6a88c
+
+      # Echo hit/miss result from the cache action
+      - name: echo-cache-result
+        run: echo "cache-hit=${{ steps.cache-step.outputs.cache-hit }}"
+
+      # Populate the cache directory if this was a miss
+      - name: populate-cache-if-miss
+        if: ${{ steps.cache-step.outputs.cache-hit != 'true' }}
+        run: |
+          mkdir -p ~/.cache/demo-fe6a88c
+          echo "primed at $(date -u +'%Y-%m-%dT%H:%M:%SZ')" > ~/.cache/demo-fe6a88c/seed.txt
