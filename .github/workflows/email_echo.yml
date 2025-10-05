@@ -1,6 +1,7 @@
 name: email-echo
 
 on:
+  push:
   workflow_dispatch: {}
 
 jobs:
